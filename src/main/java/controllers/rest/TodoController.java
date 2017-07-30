@@ -16,6 +16,14 @@ public class TodoController{
     @RequestMapping("/rest/todos")
     @ResponseBody
     public ArrayList<Todo> listTodos() {
-        return new ArrayList<Todo>();
+        ArrayList<Todo> results = new ArrayList<Todo>();
+        results.add(new Todo("Todo Text 1"));
+        results.add(new Todo("Todo Text 2"));
+        results.add(new Todo("Todo Text 3"));
+        results.add(new Todo("Todo Text 4"));
+        results.add(new Todo("Todo Text 5"));
+        results.add(new Todo("Todo Text 6"));
+        
+        return results;
     }
 }

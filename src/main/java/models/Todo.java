@@ -4,6 +4,10 @@ public class Todo {
 
 	private String title;
 
+	public Todo(String title) {
+		setTitle(title);
+	}
+
 	public String getTitle() {
 		return title;
 	}

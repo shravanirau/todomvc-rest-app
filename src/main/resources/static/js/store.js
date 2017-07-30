@@ -10,20 +10,53 @@
 	 * @param {function} callback Our fake DB uses callbacks because in
 	 * real life you probably would be making AJAX calls
 	 */
-	function Store(name, callback) {
+	function Store(name, callback, url) {
 		callback = callback || function () {};
 
 		this._dbName = name;
+	
+		this._stores = {};
+		var _stores = this._stores;
+		var todos = []
+		
+		fetch(url)  
+		  .then(  
+		    function(response) {  
+		      if (response.status !== 200) {  
+		        console.log('Looks like there was a problem. Status Code: ' +  
+		          response.status);  
+		        return;  
+		      }
 
-		if (!localStorage[name]) {
-			var data = {
-				todos: []
-			};
+		      // Examine the text in the response  
+		      response.json().then(function(todos) {  
+		        console.log(todos);  
+				var data = {
+					todos: todos,
+					url: url
+				};
+				_stores[name] = data;
+				callback.call(this, _stores[name]);
+		      });  
+		    }  
+		  )  
+		  .catch(function(err) {  
+		    console.log('Fetch Error :-S', err);  
+		  //Initialize a default in case of error
+			if (!_stores[name]) {
+				var data = {
+					todos: [],
+					url: url
+				};
 
-			localStorage[name] = JSON.stringify(data);
-		}
-
-		callback.call(this, JSON.parse(localStorage[name]));
+				_stores[name] = data;
+			}
+			callback.call(this, _stores[name]);
+		  });
+		
+		
+		
+		
 	}
 
 	/**
@@ -44,7 +77,7 @@
 			return;
 		}
 
-		var todos = JSON.parse(localStorage[this._dbName]).todos;
+		var todos = this._stores[this._dbName].todos;
 
 		callback.call(this, todos.filter(function (todo) {
 			for (var q in query) {
@@ -63,7 +96,7 @@
 	 */
 	Store.prototype.findAll = function (callback) {
 		callback = callback || function () {};
-		callback.call(this, JSON.parse(localStorage[this._dbName]).todos);
+		callback.call(this, this._stores[this._dbName].todos);
 	};
 
 	/**
@@ -74,8 +107,10 @@
 	 * @param {function} callback The callback to fire after saving
 	 * @param {number} id An optional param to enter an ID of an item to update
 	 */
+	
+	//FIXME::Use fetch api to do post calls.
 	Store.prototype.save = function (updateData, callback, id) {
-		var data = JSON.parse(localStorage[this._dbName]);
+		var data = this._stores[this._dbName];
 		var todos = data.todos;
 
 		callback = callback || function () {};
@@ -96,7 +131,7 @@
 		} else {
 			// Generate an ID
 			updateData.id = new Date().getTime();
-
+			
 			todos.push(updateData);
 			localStorage[this._dbName] = JSON.stringify(data);
 			callback.call(this, [updateData]);
