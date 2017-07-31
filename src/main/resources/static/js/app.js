@@ -21,6 +21,7 @@
 			}.bind(this);
 			
 			setView();
+			$on(window, 'hashchange', setView);
 		}, "/rest/todos");
 
 	}
@@ -28,5 +29,5 @@
 	var todo = new Todo('todos-vanillajs');
 	
 	//$on(window, 'load', setView);
-	$on(window, 'hashchange', setView);
+	//$on(window, 'hashchange', setView);
 })();
